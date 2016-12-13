@@ -1,0 +1,173 @@
+% Chapter 4
+
+\chapter{Comparison of Metabolism using Five \textit{G. Vaginalis} Strains} % Main chapter title
+
+\label{Chapter4} % For referencing the chapter elsewhere, use \ref{Chapter4}
+
+%----------------------------------------------------------------------------------------
+%---- A table showing the reaction scores from each model show go here. ----
+%------ Sequences ---------
+\section{\textit{Gardnerella vaginalis} Nucleotide Sequences}
+\indent\indent The nucleotide sequences of the genomes from five different \textit{Gardnerella vaginalis} strains: 5-1, 41V, 101, AMD, and ATCC 14019, were obtained from NCBI Nucleotide database. These nucleotide sequences in FASTA format were then uploaded to our computing cluster where they could be annotated and then reconstructed into models. Initial ASGARD annotations were also provided in Excel format containing ASGARD output from these five strains and others.  This data was used for comparison against our ASGARD runs. We also downloaded the metabolic models generated using Model SEED for these same strains so that our results could be compared.\\
+% * <jpbrooks@vcu.edu> 2016-08-31T02:41:53.839Z:
+%
+% What about the annotations that Myrna provided?
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T02:52:07.509Z.
+
+%-----------ASGARD------------
+\section{Genome Annotation using ASGARD}
+\begin{table}
+\caption{Comparison of Gene Annotations from ASGARD, NCBI and Model SEED.}
+\label{tab:gene_numbers}
+\centering
+\begin{tabular}{l l l l}
+\toprule
+\tabhead{\textit{G. vaginalis} Strain} & \tabhead{ASGARD} & \tabhead{NCBI} & \tabhead{Model SEED}\\
+\midrule
+5-1 & 2140 & 1271 & 345 \\
+AMD & 2417 & 1190 & 339 \\
+101 & 1833 & 1150 & 329 \\
+ATCC 14019 & 1485 & 1366 & 380 \\
+41V & 1210 & 1230 & 371 \\
+\bottomrule\\
+\end{tabular}
+\end{table}
+\indent\indent Understanding the genes, their products and the metabolic reactions of \textit{G. vaginalis} is crucial for researching the virulence, transmission, and therapeutics.  We used genomes of \textit{G. vaginalis} strains obtained from NCBI and other sources, then used the Automated System for Gene Annotation and Metabolic Pathway Reconstruction Using General Sequence Databases (ASGARD) to determine open reading frames and annotate the genome\citep{alves_automated_2007}. \\
+
+\indent By using ASGARD we were able to take the assembled nucleotide sequences, obtained from NCBI's nucleotide database, in FASTA file format and obtain gene annotation and predicted metabolic pathways. The data provided by ASGARD is a set of reactions for a given pathway, determined by the genes which were present during the annotation. We regarded this data as a draft model for the reactions present in each of the \textit{Gardnerella} strains. Each of these draft models was then run through our ASGARD parser script, which extracted the EC numbers in each of the pathways that were determined by ASGARD to be present.  The EC numbers were then used to obtained the specific reactions and when possible associated genes, by querying our reference database. This information was then put into the appropriate text format so that it could move on to the next step of being put through the MetModel pipeline where we would integrate gene expression data, metabolic data and our other information to increase the accuracy of the model. \\
+% * <jpbrooks@vcu.edu> 2016-08-31T02:46:24.266Z:
+%
+% > increase the accuracy and precision of the model. 
+%
+% If a model is a collection of reactions, how does MetModel "increase the precision?"
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T02:53:44.480Z.
+% * <jpbrooks@vcu.edu> 2016-08-31T02:45:30.644Z:
+%
+% >  draft models 
+%
+% So is a model a collection of reactions?
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T02:53:45.624Z.
+
+\indent To validate the gene annotation performed by ASGARD we compared the Gene Feature Format (GFF) file created by ASGARD and the GFF files obtained from NCBI and the Model SEED table containing genes and their reactions. The GFF files contain genes and their coordinates and we compared them both by looking at the number of genes and the name of the gene. We removed redundant genes within the ASGARD GFF and NCBI GFF files before performing this comparison. Table \ref{tab:gene_numbers} shows the results of this comparison. Overall, ASGARD showed an average of 72\% similarity in the genes determined to be present between the strains when compared to the genes present in the NCBI annotations for each strain. Although, there were was a strong deviation for the AMD strain which was only 49\% similar and ASGARD determined a significantly higher amount of genes found compared to the number present in the reference strain. On the contrary, the 41V strain was 98\% similar. In all cases, ASGARD determined a larger number of genes when compared to the number of genes predicted by Model SEED. This difference appeared to be due to Model SEED only regarding genes in the PATRIC database that have EC numbers attached to them \citep{devoid_automated_2013}. \\
+\indent It is clear that the ASGARD algorithm is also more greedy than the Model SEED algorithm when it comes to gene and reaction pathway determination. However, since these strains lacked experimental evidence for transcriptomic or proteomic data it is unknown if the accuracy of ASGARD to determine open reading frames and predict the genes present in an organism is better or worse than Model SEED's annotation process.  This increased amount of genes, and therefore pathways, as predicted initially by ASGARD and used as a starting point my MetModel, did eliminate the need for gapfilling during pathway reconstruction, which is a positive outcome and could indicate the ASGARD is more thorough and accurate when annotating a genome. \clearpage
+
+%--------MetModel----------
+\section{Metabolic Pathway Reconstruction Using MetModel}
+
+\indent\indent Each of the genes and reaction sets for all of the strains of \textit{Gardnerella} obtained from ASGARD, and parsed out into the appropriate format expected by MetModel were then run through the MetModel pipeline using the new MetModel tool. Our MetModel tool allows a user to start from a file that contains gene-reaction products and run through four different steps to take a set of reactions and reconstruct the individual reaction pathways in order to model an organism. For all of the strains of \textit{Gardnerella} we ran all through the steps of the MetModel script, excluding step 3 as no experimental proteomic data was available for any of the individual strains. The MetModel pipeline then allowed us to use the set of genes and reaction pathways determined by ASGARD to then apply the FBA constraint-based modeling approach.  \\
+% * <jpbrooks@vcu.edu> 2016-08-31T02:48:24.970Z:
+%
+% >  run through four different steps to build a model
+%
+% Again, "build a model" is ambiguous and not defined.
+%
+% ^ <jpbrooks@vcu.edu> 2016-08-31T02:50:02.059Z:
+%
+% I don't see how writing KEGG maps is building a model.
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T02:54:41.126Z.
+
+\indent The reconstructions created by MetModel were then compared to models available in the Model SEED database. We found that on average our reconstructions had 474 more reactions than the Model SEED reconstructions.  Another major difference to note is that during the gap-filling step in the MetModel pipeline no reactions needed to be added in order to complete pathways. Of course as previously mentioned we did add transports and escapes during the first iteration in the MetModel pipeline. It appears that MetModel ended up with more reactions because the reaction data parsed ASGARD had a much higher number of genes and reactions. While some of these reactions were removed by MetModel a significant amount stayed and thus increased the number of reactions compared to Model SEED. Comparing MetModel reconstructions to the Model SEED reconstructions it at first seemed odd there was a difference of over 400 reactions, but when looking at other models, for example, \textit{Escherichia coli K-12 MG1655} it contains 1366 genes and 2251 reactions in MetModel reconstruction and in the Orth et al. 2011 published model while in Model SEED it contains only 1132 genes and 1632 reactions. Further, the \textit{E. coli} only had transports and escapes added prior to the gap-filling step (GapFill) in MetModel while in Model SEED 38 reactions were added\citep{brooks_gap_2012}.\\
+\indent One of the principle reasons for the differences in the number of genes present from each of the annotation sources is the algorithms used to determine the genes present. ASGARD uses a greedy algorithm and it appears it could be overestimating the number of genes present.  NCBI, on the other hand, uses information uploaded by its users so depending on the methods used to annotate the organism's genome the accuracy can vary.  Further, the NCBI data is not always well curated so it is also possible that some older methods and technologies were used to sequence and annotate these organisms which could again affect the accuracy of the sequences and accuracy of the gene annotations.  Finally, Model Seed appears to be only including genes that are present in the PATRIC database and have known enzymes catalog identifiers attached to them.  While this approach does ensure the genes predicted to be present have a high degree of experimental and literature support it is likely missing out on a lot of genes whose functions have limited evidence available but are, in fact, present in the organism.
+% * <jpbrooks@vcu.edu> 2016-08-31T02:55:39.388Z:
+%
+% > our MetModel 
+%
+% What is "our MetModel?"
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T02:55:33.525Z.
+% * <jpbrooks@vcu.edu> 2016-08-31T02:54:21.955Z:
+%
+% > during prior
+%
+% ?
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T02:55:34.605Z.
+% * <jpbrooks@vcu.edu> 2016-08-31T02:53:00.332Z:
+%
+% > gapfill
+%
+% It should be GapFill and needs a citation.  GapFill adds reactions until every metabolite can be produced.  Our gap-filling algorithm (FBA-GAP) only adds reactions that are needed to produce biomass, so it should be much fewer.
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T03:03:02.342Z.
+% * <jpbrooks@vcu.edu> 2016-08-31T02:52:34.785Z:
+%
+% > during prior t
+%
+% which one?
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T03:03:01.143Z.
+% * <jpbrooks@vcu.edu> 2016-08-31T02:51:18.045Z:
+%
+% > n our MetModel pipeline no reactions needed to be added in order to complete pathways. 
+%
+% So how did we end up with more reactions then?
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T03:02:58.535Z.
+% * <jpbrooks@vcu.edu> 2016-08-31T02:50:40.189Z:
+%
+% > 474 more reactions than the Model SEED
+%
+% I would have expected fewer.  What are these additional reactions?
+%
+% ^.
+\begin{table}
+\caption{Comparing the number and types of Reactions in MetModel vs Model SEED.}
+\label{tab:numrxn}
+\centering
+\begin{tabular}{l l l}
+\toprule
+\tabhead{\textit{G. vaginalis} Strain} & \tabhead{MetModel total} &  \tabhead{Model SEED total}  \\
+\midrule
+5-1 & 1217 & 761 \\
+AMD & 1248 & 744 \\
+101 & 1220 & 760 \\
+ATCC 14019 & 1232 & 769 \\
+41V & 1235 & 745 \\
+\bottomrule\\
+\end{tabular}
+\end{table}
+%---- Scoring of Models, do I need this? -----
+\section{MetModel Validation and Scoring}
+
+\begin{table}
+\caption{The Average Confidence scores of the five strains.}
+\label{tab:strain_scores}
+\centering
+\begin{tabular}{l l l}
+\toprule
+\tabhead{\textit{G. vaginalis} Strain} & \tabhead{Score} \\
+\midrule
+5-1 & 1.92\\
+AMD & 1.84\\
+101 & 1.97 \\
+ATCC 14019 & 6.89 \\
+41V & 1.94 \\
+\bottomrule\\
+\end{tabular}
+\end{table}
+\indent\indent First, we compared the draft models from ASGARD to each other. We found that ASGARD determined 153 pathways in each of the strains, consisting of an average of 1802 reactions in total.  We also compared these individual models against a previous ASGARD run after as we were utilizing updated reference databases from UniProt. This comparison revealed that there was no difference between our ASGARD pathway data and the previous version. This data was then formatted into the appropriate format and the MetModel pipeline was used without data integration.  The MetModel pipeline added an average of 22 sources, 2 escapes and during the FBA-GAP no reactions were added. Overall the models had an average of 1230 reactions, and the reaction sets present in each given pathway were highly similar >85\%.  This high degree of similarity supports the results from the gene annotations from ASGARD where both the number of genes, types of genes and the initial pathway predictions were very similar as well. \\
+% * <jpbrooks@vcu.edu> 2016-08-31T02:57:15.084Z:
+%
+% > gapfill
+%
+% MetModel implements FBA-GAP, not GapFill.
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T03:06:41.745Z.
+% * <jpbrooks@vcu.edu> 2016-08-31T02:56:15.994Z:
+%
+% > etermined an 153 pathways
+%
+% ? Is this pooled for all strains
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T03:11:23.169Z:
+%
+% This was pretty consistent throughout all the models that there are 153 unique pathways. Where pathway is 00010 Glycolysis or 00020 Citrate Cycle (TCA Cycle) etc.
+%
+% ^.
+
+\indent Once we completed the models for each of these strains we then used the scoring function to determine relative confidence scores for each of the reactions and averaged them to produce an overall score for each individual strain model. The results shown in Table \ref{tab:strain_scores} demonstrate that with the exception of ATCC 14019 there was very minimal experimental data about reactions, pathways and gene products available for these \textit{Gardnerella} strains. These scores of 2 or less indicate that there is no evidence in PubMed that supports the presence of the gene to protein to reaction association (GPR), with the exception of strain ATCC 14019 (with a score of 6.89) which has published evidence of the GPRs associated with its model. First, these results indicate that there is a clear lack of evidence supporting the reaction pathways determined by the pipeline to be present in the model. Thus it makes it difficult to say confidently that for these given strains of \textit{G. vaginalis} have a high degree of accuracy as it is unknown if these GPRs are truly present in these organisms. Further, these results also indicated a problem with the current automated scoring system. The automated scoring system is designed to look for GPRs that have KEGG IDs for genes. In all the strains except ATCC 14019 no KEGG ID was given for the GPR as these organisms do not exist in KEGG, and thus the results are likely skewed. \\
+

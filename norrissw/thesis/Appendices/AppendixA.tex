@@ -1,0 +1,31 @@
+% Appendix A
+
+\chapter{Users Guide - Building Genome Scale Metabolic Reconstructions} % Main appendix title
+
+\label{AppendixA} % For referencing this appendix elsewhere, use \ref{AppendixA}
+
+This will serve as a guide on how to actually execute the steps required to go from a nucleotide FASTA file to the complete KGML pathway maps for a given organism.  This is targeted at VCU faculty, students, and staff as it will refer to specific locations and servers housed in the CHPC.
+
+\section{Using ASGARD}
+\indent Asgard is installed on the distributed computing cluster called Godel.  It makes use of Grid Engine to distribute the various Blast processes and other jobs to different nodes. Since it is installed on Godel you first have to have an account there. If you do not already have access to Godel ask your advisor for how you can go about obtaining one. For the rest of the guide we will assume that you have access to Godel via SSH/SFTP (remember off campus will require VPN access as well) and proper permissions to access the ASGARD and BLAST executables.\\
+Start by uploading the FASTA file you wish to run through ASGARD, then login to Godel and enter the directory where your sequence is stored. I highly recommend you have this sequence file alone and in its own appropriately named directory as it will make your life easier later on. Once in the directory you can run the following command to queue the ASGARD jobs:
+\texttt{/usr/global/blp/bin/asgard -i \textit{YOURSEQUENCE.fasta} \\ 
+-p blastx -n 20 -d /gpfs\char`_fs/data/refdb/asgardDB/UniRef100 \\
+-d /gpfs\char`_fs/data/refdb/asgardDB/KEGG \\ 
+-f /gpfs\char`_fs/data/refdb/asgardDB/uniref100.fasta.gz\\ 
+-f /gpfs\char`_fs/data/refdb/asgardDB/genes.pep.gz \\
+-l /gpfs\char`_fs/data/refdb/asgardDB}
+\\
+Where 
+\textbf{/usr/global/blp/bin/asgard} is the location of the ASGARD executable, \textbf{-i} is the flag for your FASTA file, \textbf{-p} is which blast program to use (generally blastx but consult the NCBI Blast documentation if you are unsure), \textbf{-n} is the number of nodes to use, \textbf{-d} specifies the locations of the protein databases, while \textbf{-f} specifies the FASTA files that correspond to the databases specified in the -d command, and finally \textbf{-l} is the location of the mapping files.\\
+\indent Once ASGARD completes successfully, usually within a few hours, you will find a number of new files present in the directory where you stored your sequence. I'm going to focus on the four that are of interest in relation to create metabolic reconstructions. These five files will be named YOURSEQUENCE.fasta but have the extensions: .gff, .path\char`_rec, .paths, .paths.detail, again where YOURSEQUENCE.fasta is the name if your FASTA file given to ASGARD.  There are usually two files with the extension GFF which are the General Feature Format (GFF) files that contain information about the open reading frames identified by ASGARD. Next, the path files contain summary or detailed information about the genes implicated in pathways, and the pathways that were matched based on those genes. It is worthwhile at this time to review and make sure you understand what the output of these files are before continuing, but once satisfied run:\\ \texttt{python asgard\char`_parse.py YOURSEQUENCE.fasta.paths} \\ and it will generate a single file that contains the information required to run the MetModel pipeline.
+
+\section{Using MetModel}
+\indent\indent Since MetModel is a Python Library it may be difficult to setup, luckily it is already installed on Dr. Brooks's server as well as godel. There aren't a lot of prerequisites for MetModel but you will need install Gurobi if it is not installed and you will need a license for Gurobi (even if it is already installed). Once you have Gurobi installed you can clone git repository hosted on GitHub: \href{https://github.com/metabolic-reconstruction/met-modeling}{Met-Modeling on GitHub}.  In any case, you just need to make sure that the install locations are provided to your PYTHONPATH environmental variable. Contact a system administrator if you are unsure how to do this yourself.  From here we will assume you can \texttt{import metmodel} from within Python. The rest of this guide assumes you are working with ASGARD data and are already within the working directory where you have your asgard\char`_parse output. Once you have cloned the GitHub or have access to the MetModel Python library in your Python path and have downloaded the met\char`_model.py script, you can now run the four steps in our metabolic reconstruction pipeline by typing:\\ 
+% * <jpbrooks@vcu.edu> 2016-08-31T03:03:12.952Z:
+%
+% Mention that Gurobi needs to be installed.
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T03:14:15.354Z.
+\texttt{python met\char`_model.py -i YOURSEQUENCE.txt -t TXT -x exchanges -b biomass -ndi } \\ If you have metabolomic or gene expression data available you can specify \textbf{-m} or \textbf{-d} for each respectively and \textbf{omit the -ndi} flag. For more information you can also run \texttt{python met\char`_model.py -h} for a list of all the available options.\\
+\indent Once met\char`_model.py is invoked it will run a step and then pause, asking you to continue, while paused it is possible to modify and view files as your see fit.  Then once complete you will be able to view the KGML pathway maps using a KGML viewer of your choice.

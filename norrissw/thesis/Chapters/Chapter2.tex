@@ -1,0 +1,57 @@
+% Chapter 2
+
+\chapter{Curating a Database for Metabolic Reconstructions} % Main chapter title
+
+\label{Chapter2} % For referencing the chapter elsewhere, use \ref{Chapter2} 
+
+%----------------------------------------------------------------------------------------Those Damn Databases Again----------
+\section{Reference Databases}
+
+\indent\indent Upon starting this project MetModel already used a comma separated file (CSV) that contained reactions from the Kyoto Encyclopedia of Genes and Genomes (KEGG), the SEED database and contributions from Dr. Niti Vanee and published by Dr. Bernhard Palsson \citep{ogata_kegg:_1999, overbeek_seed:_2004, vanee_genome_2009, shlomi_network-based_2008}. However, despite these reactions all being in a single file, there was no way to relate the reactions to each other.  It was apparent that there were duplicate reactions that were represented in different formats and that the overall process of looking up reactions could be improved by creating a standardized format for the reactions. \clearpage
+
+\subsection{Reference Database Collection and Clean Up}
+
+\indent\indent To collect and clean up the information housed in the Kyoto Encyclopedia of Genes and Genomes (KEGG), Chemical Entities of Biological Interest (ChEBI), and the SEED database, when SQL or CSV files were available they were downloaded, but often information needed to be scraped from these online sources\citep{ogata_kegg:_1999, degtyarenko_chebi:_2008, overbeek_seed:_2004}. Web scraping was performed using Scrapy \citep{_scrapy_????}. Scrapy is a web scraping toolkit written in Python. Scrapy made it possible to download all of the information from these websites and simultaneously format it in a standardized way that we could then parse and load into a PostgreSQL database.\\
+\begin{table}
+\caption{An example of the data stored in new Compound Reference SQL Table.}
+\label{tab:CPDID}
+\centering
+\begin{tabular}{l l l l l l}
+\toprule
+\tabhead{KEGG ID} & 
+\tabhead{SEED ID} & \tabhead{CHEBI ID}&
+\tabhead{VANEE} &
+\tabhead{PALSSON} &
+\tabhead{Name} \\
+\midrule
+C00001 & cpd00001 & 15377 & H$_2$O & H$_2$O & Water\\
+C00002 & cpd00002 & 15422 & ATP & ATP & ATP \\
+C00003 & cpd00003 & 13389 & NAD+ & NAD+ & NAD \\
+C00004 & cpd00004 & 16908 & NADH & NADH & NADH \\
+\bottomrule\\
+\end{tabular}
+\end{table}
+\indent Loading all of this data into a SQL database made it possible to query this data simultaneously. Having all this data in a single place then allowed us to develop a Python pipeline to query each of these sources concurrently to return the identifiers for a given compound or reaction associated within each of these respective databases. This allowed for the creation of a standardized format and thus reduce duplicate information. For example, one of the biggest issues with the reactions is how the compounds are named. KEGG may refer to water as H$_2$O while SEED may actually refer to it as water. In another example, when water is donating a proton in a particular reaction some databases referred this as just H while in others H+,H$_2$O or even H$_3$O$^+$ even though the reaction was the same and clearly involved a single H (proton) being donated. With the methods described here we obtained the full set of metabolites and their associated information and we used pattern matching to automate the translation of these reactions into a standardized format using the KEGG identifiers (if available) for that given compound. The format took after the form of the KEGG identifiers like $C00001 + C00404 <=> C02174$ where C00001 represents H2O, C00404 represents polyphosphate and C02174 represents oligophosphate. If the compound was not found in the KEGG database but was present in others it was assigned a UNK000X identifier. Table \ref{tab:CPDID} shows a sample of the results from the compound reference table. \\
+\indent Any reactions not automatically translated were flagged and reviewed manually.  Once all of the compounds and reactions were in the same format we then quickly created a mapping of like equations.  This mapping was stored in a PostgreSQL table so that we could quickly access relevant information in each database by retrieving its appropriate ID from the database. Table \ref{tab:RXNID} shows a sample of the results from the reaction reference table. \\
+\indent Once completed, using Python and SQL statements, a quick and easy method to retrieve all of the relevant data and analysis resources from these pathway/genome databases was created. This rapid look-up helped us obtain and verify metabolic pathways and enzymes derived from experimental results published in the scientific literature. In particular, this is needed because unfortunately these databases are not always well maintained and information in any one source may be out of date or inaccurate. By using this method we kept up to date in order to best assign and verify the function for the majority of genes in selected genomes.
+
+\begin{table}
+\caption{An example of the data stored in new Reaction Reference SQL Table.}
+\label{tab:RXNID}
+\centering
+\begin{tabular}{l l l l l l}
+\toprule
+\tabhead{KEGG ID} & 
+\tabhead{SEED ID} &
+\tabhead{NITI} &
+\tabhead{PALSSON} &
+\tabhead{EC Number(s)} \\
+\midrule
+R01867 & rxn09563 & R\_DHORD4 & R\_DHORD4 & 1.3.3.1 \\
+R04749 & rxn03250 & R\_ECOAH2 & R\_ECOAH2 & 4.2.1.17|4.2.1.74  \\
+R00405 & rxn00285 & R\_SUCOAS & R\_SUCOAS &  6.2.1.4|6.2.1.5 \\
+R03146 & rxn10115 & R\_FDH3 & R\_FDH3 &  1.2.2.1\\
+\bottomrule\\
+\end{tabular}
+\end{table}
+%----------------------------------------------------------------------------------------

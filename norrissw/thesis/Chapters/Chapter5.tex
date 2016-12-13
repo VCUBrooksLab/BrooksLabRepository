@@ -1,0 +1,30 @@
+% Chapter 5
+
+\chapter{Future Directions} % Main chapter title
+ 
+\label{Chapter5} % For referencing the chapter elsewhere, use \ref{Chapter5}
+
+%----------------------------------------------------------------------------------------
+
+\indent\indent Here we have developed a semi-automated process for taking the nucleotide sequence of an organism's genome to reconstruction it's metabolic reaction networks.  From there using our in-house developed scoring function we were able to assign a confidence score to help determine the quality of the reactions present in the model.  While our results validate this process there are a few things that need more research and development.\\
+\indent Since there was no expression data available for these \textit{G. vaginalis} strains if expression level data becomes publicly available it would be constructive to rebuild these models and incorporate that data. By incorporating experimental data the MetModel results will more accurately represent the organisms pathways. It would also be useful to determine the KEGG ID GPRs for these organisms, even if experimental data is unavailable at least by similarity, it could be possible to lend confidence to the models by relating known genes within the reference strains of {\it Gardnerella}.\\
+% * <jpbrooks@vcu.edu> 2016-08-31T03:00:52.709Z:
+%
+% are likely to be more accurate because ...
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T11:45:37.067Z.
+% * <jpbrooks@vcu.edu> 2016-08-31T02:59:43.988Z:
+%
+% >  accurate results and predictions.
+%
+% How so?
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T11:45:40.298Z.
+% * <jpbrooks@vcu.edu> 2016-08-31T02:59:14.755Z:
+%
+% > Since there was no expression data available for these \textit{G. vaginalis} strains. 
+%
+% incomplete sentence
+%
+% ^ <norrissw@vcu.edu> 2016-09-01T03:12:09.038Z.
+\indent Next, it would be useful to further improve the scoring process to return more information about the publications found. For example, the scoring function only does a single search for the GPR based on the information about the GPR in KEGG.  It would be beneficial if it could also return data based on EC or even gene functional type in the event the organism is not a direct match.  Further, the function presently does not return the dates or methods of the relevant publications and this could help improve confidence as more recent papers likely may have a greater degree of accuracy and precision.\\
